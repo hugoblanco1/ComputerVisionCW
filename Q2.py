@@ -1,9 +1,6 @@
 from PIL import Image
 import numpy as np
 
-img = np.array(Image.open("flower.jpg").convert("RGB"))
-print(img.shape, img.dtype)
-
 
 def patch_rgb_hist(patch: np.ndarray, bins: int = 8) -> np.ndarray:
     hist = np.zeros(3 * bins, dtype=float)
@@ -51,6 +48,9 @@ def spatial_hist_2x2(img: np.ndarray, bins: int = 8) -> np.ndarray:
 
 
 def main():
+    img = np.array(Image.open("flower.jpg").convert("RGB"))
+    print(img.shape, img.dtype)
+
     feature_vec = spatial_hist_2x2(img, bins=8)
     print("Feature length:", feature_vec.size)
     print(feature_vec)
