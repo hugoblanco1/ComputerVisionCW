@@ -1,7 +1,7 @@
 import numpy as np
 
 def compute_forward_transform(points, theta, t):
-  # Calculates the forward transformation so i can test the inverse transformation funciton 
+  # forward transform used to test the inverse function
   
     points = np.asarray(points, dtype=float)
     t = np.asarray(t, dtype=float)
