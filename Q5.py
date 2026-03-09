@@ -1,5 +1,4 @@
-
-# Question 5 - CIFAR-10 MLP Classifier
+# Question 5 CIFAR-10 MLP Classifier
 
 import copy
 import numpy as np
