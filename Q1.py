@@ -18,13 +18,13 @@ def compute_sobel_gradient(img: np.ndarray, x: int, y: int) -> Tuple[float, floa
         [-1, 0, 1],
         [-2, 0, 2],
         [-1, 0, 1]
-    ], dtype=float)
+    ], dtype=float) / 8
 
     sobel_y = np.array([
         [-1, -2, -1],
         [0, 0, 0],
         [1, 2, 1]
-    ], dtype=float)
+    ], dtype=float) / 8 
 
     patch = img[x-1:x+2, y-1:y+2].astype(float)
 
@@ -42,13 +42,13 @@ def compute_diagonal_corrected_gradient(img: np.ndarray, x: int, y: int) -> Tupl
         [-3, 0, 3],
         [-10, 0, 10],
         [-3, 0, 3]
-    ], dtype=float) / 10
+    ], dtype=float) / 32
 
     dy = np.array([
         [-3, -10, -3],
         [0, 0, 0],
         [3, 10, 3]
-    ], dtype=float) / 10
+    ], dtype=float) / 32
 
     patch = img[x-1:x+2, y-1:y+2].astype(float)
 
