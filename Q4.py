@@ -1,43 +1,61 @@
 import numpy as np
 
+def compute_forward_transform(points, theta, t):
+  # Calculates the forward transformation so i can test the inverse transformation funciton 
+  
+    points = np.asarray(points, dtype=float)
+    t = np.asarray(t, dtype=float)
 
-def compute_inverse_transform(points, theta, t):
-    pts = np.array(points, dtype=float)
-    shift = np.array(t, dtype=float)
+    centroid = np.mean(points, axis=0)
 
-    angle = np.radians(theta)
+    cos_theta = np.cos(theta)
+    sin_theta = np.sin(theta)
 
-    undo_rotation = np.array([
-        [np.cos(-angle), -np.sin(-angle)],
-        [np.sin(-angle),  np.cos(-angle)]
+    rotation = np.array([
+        [cos_theta, -sin_theta],
+        [sin_theta,  cos_theta]
     ])
 
-    moved_centre = np.mean(pts, axis=0)
-    original_centre = moved_centre - shift
+    transformed_points = np.dot(points - centroid, rotation.T) + centroid + t
+    return transformed_points
 
-    recovered = []
 
-    for point in pts:
-        point_back = undo_rotation @ (point - original_centre - shift) + original_centre
-        recovered.append(point_back)
+def compute_inverse_transform(points, theta, t):
+    points = np.asarray(points, dtype=float)
+    t = np.asarray(t, dtype=float)
+    transformed_centroid = np.mean(points, axis=0)
+    original_centroid = transformed_centroid - t
 
-    return np.array(recovered)
+    cos_theta = np.cos(theta)
+    sin_theta = np.sin(theta)
+
+    rotation = np.array([
+        [cos_theta, -sin_theta],
+        [sin_theta,  cos_theta]
+    ])
+
+    # undo translation and undo rotation
+    recovered_points = np.dot(points - transformed_centroid, rotation) + original_centroid
+    return recovered_points
 
 
 def main():
-    transformed_points = np.array([
-        [3.0, 2.0],
-        [2.0, 3.0],
-        [4.0, 3.0]
-    ])
+    points = np.array([
+        [2, 9],
+        [11, 1],
+        [6, 7],
+        [54, 2]
+    ], dtype=float)
 
-    theta = 45
-    t = [1.0, 2.0]
+    theta = np.pi / 4
+    t = np.array([3, 2], dtype=float)
 
-    original_points = compute_inverse_transform(transformed_points, theta, t)
+    transformed = compute_forward_transform(points, theta, t)
+    recovered = compute_inverse_transform(transformed, theta, t)
 
-    print("Recovered points:")
-    print(original_points)
+    print("Original points:", points)
+    print("\nTransformed points:", transformed)
+    print("\nRecovered points:", recovered)
 
 
 if __name__ == "__main__":
