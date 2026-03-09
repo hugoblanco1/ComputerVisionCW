@@ -3,54 +3,57 @@ import numpy as np
 
 
 def patch_rgb_hist(patch: np.ndarray, bins: int = 8) -> np.ndarray:
-    hist = np.zeros(3 * bins, dtype=float)
+    hist_vec = np.zeros(3 * bins, dtype=float)
 
-    h, w = patch.shape[:2]
+    height, width = patch.shape[:2]
 
-    for c in range(3):
-        for i in range(h):
-            for j in range(w):
-                v = int(patch[i, j, c])
-                b = (v * bins) // 256
-                hist[c * bins + b] += 1.0
+    for channel in range(3):
+        for row in range(height):
+            for col in range(width):
+                pixel_val = int(patch[row, col, channel])
+                bin_index = (pixel_val * bins) // 256
+                hist_vec[channel * bins + bin_index] += 1.0
 
-        start = c * bins
-        end = start + bins
-        total = sum(hist[start:end])
+        start_idx = channel * bins
+        end_idx = start_idx + bins
+        total_vals = sum(hist_vec[start_idx:end_idx])
 
-        if total > 0:
-            hist[start:end] = hist[start:end] / total
+        if total_vals > 0:
+            hist_vec[start_idx:end_idx] = hist_vec[start_idx:end_idx] / total_vals
 
-    return hist
+    return hist_vec
 
 
 def spatial_hist_2x2(img: np.ndarray, bins: int = 8) -> np.ndarray:
-    h, w = img.shape[:2]
-    yc = h // 2
-    xc = w // 2
+    height, width = img.shape[:2]
+    mid_y = height // 2
+    mid_x = width // 2
 
-    patches = [
-        img[0:yc, 0:xc],
-        img[0:yc, xc:w],
-        img[yc:h, 0:xc],
-        img[yc:h, xc:w],
+    # split image up
+    regions = [
+        img[0:mid_y, 0:mid_x],
+        img[0:mid_y, mid_x:width],
+        img[mid_y:height, 0:mid_x],
+        img[mid_y:height, mid_x:width],
     ]
 
-    feat = np.zeros(4 * 3 * bins, dtype=float)
+    final_vec = np.zeros(4 * 3 * bins, dtype=float)
 
     pos = 0
-    for p in patches:
-        hv = patch_rgb_hist(p, bins)
-        feat[pos:pos + hv.size] = hv
-        pos += hv.size
+    for region in regions:
+        region_hist = patch_rgb_hist(region, bins)
+        final_vec[pos:pos + region_hist.size] = region_hist
+        pos += region_hist.size
 
-    return feat
+    return final_vec
 
 
 def main():
+    # load rgb image
     img = np.array(Image.open("flower.jpg").convert("RGB"))
     print(img.shape, img.dtype)
 
+    # build feature vector
     feature_vec = spatial_hist_2x2(img, bins=8)
     print("Feature length:", feature_vec.size)
     print(feature_vec)
